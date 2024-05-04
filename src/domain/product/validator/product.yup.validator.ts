@@ -2,7 +2,7 @@ import ValidatorInterface from "../../@shared/validator/validator.interface";
 import Product from "../entity/product";
 import * as yup from "yup";
 
-export default class CustomerYupValidator
+export default class ProductYupValidator
   implements ValidatorInterface<Product>
 {
   validate(entity: Product): void {
@@ -12,12 +12,15 @@ export default class CustomerYupValidator
         .shape({
           id: yup.string().required("Id is required"),
           name: yup.string().required("Name is required"),
-          price: yup.string().required("Price is required"),
+          price: yup
+                .number()
+                .moreThan(0, 'Price must be greater than zero')
         })
         .validateSync(
           {
             id: entity.id,
             name: entity.name,
+            price: entity.price
           },
           {
             abortEarly: false,
@@ -27,7 +30,7 @@ export default class CustomerYupValidator
       const e = errors as yup.ValidationError;
       e.errors.forEach((error) => {
         entity.notification.addError({
-          context: "customer",
+          context: "product",
           message: error,
         });
       });
